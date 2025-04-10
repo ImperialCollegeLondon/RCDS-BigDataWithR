@@ -28,7 +28,7 @@ in-person or online
       
 ## Data for practice
 
-- data can be download from [here or data folder](https://github.com/ImperialCollegeLondon/RCDS-BigDataWithR/raw/refs/heads/main/compustat2023.csv.zip)
+- data can be download from [here or data folder](https://github.com/ImperialCollegeLondon/RCDS-BigDataWithR/raw/refs/heads/main/data/compustat2023.csv.zip)
 
 - columns in the data
   - "gvkey": Company identifiers in the Compustat database  
