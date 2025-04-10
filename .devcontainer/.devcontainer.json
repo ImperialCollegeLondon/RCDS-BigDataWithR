@@ -1,0 +1,30 @@
+{
+  "name": "RStudio Codespace",
+  // Use a base image. Debian or Ubuntu are good choices.
+  // You could also explore Rocker project images (ghcr.io/rocker-org/devcontainer/r-ver)
+  // but this example uses a generic base for broader applicability.
+  //"image": "mcr.microsoft.com/devcontainers/base:ubuntu", // Or :debian
+  "image": "rocker/binder:latest",
+
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+        "packages": "languageserver,httpgd,dplyr,dtplyr,data.table,sparklyr"
+    },
+  },
+
+  "forwardPorts": [8787], // Forward the RStudio port
+
+  "portsAttributes": {
+    "8787": {
+      "label": "RStudio", // Label for the forwarded port
+      "onAutoForward": "openBrowser" // Action when port is detected
+    }
+  },
+
+  // Commands to run *once* after the container is created.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // Commands to run *every time* the container starts.
+  "postStartCommand": "sudo rstudio-server start",
+
+}

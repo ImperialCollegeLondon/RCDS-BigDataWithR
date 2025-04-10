@@ -1,0 +1,211 @@
+---
+title: "Part 1: Big data with data.table"
+output: html_notebook
+---
+
+# data.table and dtplyr
+
+`data.table` is an advanced version of `data.frame` in R. It provides higher performance, such as faster read/write speed and memory efficiency etc, in processing large data. 
+
+To use `data.table` in R, the package `data.table` needs to be installed. 
+
+```{r load required libraries, message=F, warning=F}
+library(data.table)
+library(dplyr)
+library(dtplyr)
+```
+
+
+## Load data
+
+`fread()` is a function provided by `data.table` package. It offers a faster and more convenient way to load large data. Similar to the legacy function `read.csv()`, all controls such as sep, colClasses and nrows are automatically detected.
+
+* Run `fread()` function to load testing data. 
+    
+* Compare the performance of `read.csv()` and `fread()`. (Hint: to observe the performance, `Sys.time()`)
+    
+```{r load data}
+# use read.csv() and Sys.time() to check the loading time
+# for example
+# starting <- Sys.time()
+# compustat <- read.csv("path/to/data")
+# Sys.time() - starting
+
+
+# use fread() and Sys.time() to observe the loading time
+```
+
+## Data manipulation
+
+### Use of `[]` and `:=` operators and functions applied to data.table
+
+Let's go through the following examples to get familiar with the operations.
+
+#### Exercise 1.1 Find type/dimension of the data
+
+* Use of `nrow` function
+  
+* Run
+```{r check data dimension}
+nrow(compustat)
+dim(compustat)
+class(compustat) # str() can be used alternatively
+```
+
+
+#### Exercise 1.2 Convert datadate to Date type
+
+* Convert `datadate` column to `Date` type.
+  
+* Run 
+```{r convert data type}
+compustat[, datadate:=as.Date(as.character(datadate), 
+                format = "%Y-%m-%d")]
+```
+
+#### Exercise 1.3 Select a subset
+
+* Select a subset containing the stock "BRITISH AMER TOBACCO PLC".
+  
+* Run
+```{r select BAT}
+BAT <- compustat[conm == "BRITISH AMER TOBACCO PLC"]
+```
+  
+* Select a subset containing the stock "BRITISH AMER TOBACCO PLC" with iid "01W".
+  
+
+```{r select BAT_01W}
+BAT_01W <- compustat[conm == "BRITISH AMER TOBACCO PLC" 
+                        & iid == "01W"]
+```
+
+* Select a subset holds the stock "GOODWIN PLC" and "BRITISH AMER TOBACCO PLC".
+
+```{r select GOODWIN and BAT}
+GOODWIN_BAT <- compustat[conm %in% c("GOODWIN PLC", "BRITISH AMER TOBACCO PLC")]
+```
+
+*NOTE*: This method requires exact match. Any thoughts for a better solution?
+
+```{r select GOODWIN and BAT 1}
+GOODWIN_BAT <- compustat[conm %like% "GOODWIN|BRITISH AMER"]
+```
+
+
+#### Exercise 1.4 Add a new column
+
+* Add a new column, Year and Quarter, in the `BAT_01W`. (Hint: use `zoo` library and `as.yearqtr` function to implement this task)
+
+```{r added year quarter}
+BAT_01W<-BAT_01W[, YearQ:=as.yearqtr(datadate)]
+```
+
+
+#### Exercise 1.5 Summarise mean close price
+
+* There were multiple exchange codes, identified by the column `exchg`. Using the parameter `by` to calculate the mean values of each stock exchange code, run the following code and observe the result.  
+
+```{r mean close price for each stock code}
+
+compustat[, .(avg_prccd = mean(prccd)), by = exchg]
+
+```
+
+* What is the issue? How to address it? Please update the code.
+
+```{r updated mean close price for each stock code}
+compustat[is.finite(prccd)][, .(avg_prccd = mean(prccd)), by = exchg]
+```
+
+#### Exercise 1.6 Summarise mean close price with two grouping keys
+
+* Now use `exchg` and `iid` as grouping keys to calculate the mean values of close price.
+
+```{r updated mean close price}
+compustat[is.finite(prccd)][, .(avg_prccd = mean(prccd)), by = .(exchg, iid)]
+```
+
+
+#### Exercise 1.7 Order the dataset
+
+* `order()` is the function can be used for ordering the data by the key(s) (that is, column(s)). For example, `BAT[order(iid)]` will sort the dataset ordered by `iid`. Applying `-` sign to allow descending order, like, `BAT[order(-iid)]`
+
+* Try to sort `BAT` with descending ordered `iid` and ascending ordered `datadate`.
+
+```{r order BAT data}
+BAT[order(-iid, datadate)]
+```
+
+#### Exercise 1.8 Find the top 15 stocks with median close price
+
+* Use the skills gained from the above exercises to list the top 15 stocks with their median close price.
+
+```{r get top 15 stocks med clos price}
+tail(compustat[is.finite(prccd)][, .(med_prccd = median(prccd)), by = .(gvkey, iid, conm)][order(med_prccd)],15)
+
+# alternative method
+head(compustat[is.finite(prccd)][, .(med_prccd = median(prccd)), by = .(gvkey, iid, conm)][order(-med_prccd)],15)
+
+```
+
+#### Exercise 1.9 Calculate simply daily returns for each stock
+
+* Add a new column to hold the simply daily returns 
+
+$$returns_t = \frac{prccd_t}{prccd_{t-1}} - 1$$.
+
+(Hint: the data should be ordered on the columns `gvkey`,`conm`, `iid` and `datadate`, and grouped by the columns `gvkey`,`conm` and `iid` for the calculation of daily returns)
+
+```{r daily returns}
+compustat <- compustat[is.finite(prccd)][order(gvkey, conm, iid, datadate)][, returns := 
+                                                            prccd/shift(prccd, type = "lag") - 1, 
+                                                          by = .(gvkey, conm, iid)]
+```
+
+
+#### Exercise 1.10 Calculate high price range and low price range of each stock
+
+* Calculate high price range and low price range of each stock and save the result in a new variable.
+
+```{r}
+result <- compustat[ (is.finite(prchd) & is.finite(prcld))][, .(high_range = max(prchd) - min(prchd),
+                         low_range = max(prcld) - min(prcld)),
+                     by = .(gvkey, iid, conm)]
+                     
+```
+
+
+### Use pipe operations
+
+#### Use pipe operations `%>%` to repeat above exercises
+
+* To translate pipe operations to [] operations, `lazy_dt()` and `show_query()` are needed. For example, translating the following code 
+```{r pipe operations}
+compustat %>% mutate(datadate = 
+          as.Date(as.character(datadate), format="%Y%m%d") )
+```
+to `[]` operations, you can run the following line
+```{r translate pipe to square brackets}
+compustat %>% 
+      lazy_dt() %>% 
+      mutate(datadate = as.Date(as.character(datadate), 
+            format="%Y%m%d") ) %>% 
+            show_query()
+``` 
+
+**NOTE:** The translation often needs to be tweaked before working.
+
+Another example of tranlsation.
+```{r another example of translation}
+compustat %>% 
+  lazy_dt() %>% 
+  group_by(gvkey, conm, iid) %>% 
+  arrange(datadate) %>% 
+  mutate(returns = prccd/lag(prccd) -1 ) %>% 
+  ungroup() %>% 
+  show_query()
+```
+
+
+## Part 1 ends.

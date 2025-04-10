@@ -1,0 +1,6 @@
+code/*.log
+code/metastore_db/*
+code/.DS_Store
+code/.gitkeep
+data/.gitkeep
+fig/.gitkeep

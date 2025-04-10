@@ -1,0 +1,238 @@
+---
+title: "Part 2: More advanced big data integration with Spark"
+output: html_notebook
+---
+
+# Sparkly
+
+* Some general guidelines: If the size of data is less than 25% of computer RAM, R should generally be comfortable to process. When the size is about 50% of RAM, `data.table` should be still fine. When the size is about 50% -- 75% of RAM, it is worth trying `sparklyr`.
+
+## Set up running environment
+
+To set up a running environment for allowing Spark connection to a file, `sparklyr` library needs to be loaded and configured.
+
+Run the following configuration to complete setup.
+
+```{r load libs, warning=F, message=F}
+library(sparklyr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r set up spark env}
+
+# Initialize configuration with default settings
+config <- spark_config()
+
+# Setup memory
+config$`sparklyr.shell.driver-memory` <- "4G"
+config$`sparklyr.shell.executor-memory` <- "8G"
+config$`spark.yarn.executor.memoryOverhead` <- "4G"
+
+# Connnect to local cluster with the configuration given above
+sc <- spark_connect(master = "local", config = config)
+```
+* For more details please check [here](https://therinspark.com/tuning.html).
+
+**General Guidelines**:
+
+Leave Memory for the OS: Reserve around 2-4GB for the operating system and other applications.
+
+Allocate Memory for Driver (shell.driver-memory) and Executors (shell.executor-memory): Divide the remaining memory between the driver and executors.
+
+Example Configuration:
+Assuming you have 16GB RAM in total, reserve 4GB for the OS, and leave 12GB available for Spark. You can then allocate memory as follows:
+
+Driver Memory: Allocate around 4GB to the driver.
+Executor Memory: Allocate the remaining 8GB to the executors.
+
+Optional: the yarn.executor.memoryOverhead configuration in Spark specifies the amount of additional memory allocated per executor process. 
+
+
+## Set connection to the CSV data
+
+```{r connect to csv}
+compustat <- spark_read_csv(sc, "~/Downloads/computstat_gbr_2014_2024.csv")
+```
+
+
+## Sparklyr exercises
+
+### Exercise 2.1 Check data length 
+
+* Find the number of rows of data
+  
+```{r find the row number}
+sdf_nrow(compustat)
+```
+
+### Exercise 2.2 Select a subset
+
+* Select a subject contains British American Tobacco with iid as 01W.
+
+
+```{r}
+BAT_01W <- compustat %>% 
+    filter(conm == "BRITISH AMER TOBACCO PLC" , iid == "01W")
+```
+
+* Plot the close price "prccd" of the stock of British American Tobacco
+
+```{r}
+ggplot(BAT_01W, aes(x = datadate, y=prccd)) + geom_line()
+```
+
+### Exercise 2.3 Add new column(s)
+
+* Add a new column `YearQ` for holding year and quarters information.
+
+```{r added year quarter}
+BAT_01W<-BAT_01W %>% 
+  mutate(YearQ=paste(year(datadate), quarter(datadate)))
+```
+
+
+### Exercise 2.4 Calculate simple daily returns.
+
+* Use the following equation to calculate simple daily returns.
+
+$$returns_t = \frac{prccd_t}{prccd_{t-1}} - 1$$.
+
+```{r daily returns}
+compustat1 <- compustat %>% 
+  group_by(gvkey, iid, conm) %>% 
+  arrange(datadate) %>% 
+  mutate(daily_returns = prccd/lag(prccd) - 1) %>% 
+  ungroup() 
+```
+
+### Exercise 2.5 Summarise
+
+* Summarise the mean values and SD of close price (`prccd`).
+
+```{r}
+mean_close <- compustat %>% 
+  filter(!is.na(prccd)) %>% 
+  group_by(gvkey, iid, conm) %>% 
+  summarise(mean_prccd = mean(prccd), sd_prccd = sd(prccd)) %>% 
+  ungroup() %>% 
+  collect()
+```
+
+### Exercise 2.6 Outlier detection
+
+```{r outliers detection}
+quantile_stats <- BAT %>% 
+  select(daily_returns) %>% 
+  collect() %>% 
+  quantile(., probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = T) 
+  
+
+# Check collected stats
+print(quantile_stats)
+
+# Calculate IQR and bounds in R
+q1 <- quantile_stats[2]
+q3 <- quantile_stats[4]
+iqr_val <- q3 - q1
+lower_bound <- as.numeric(q1 - 1.5 * iqr_val)
+upper_bound <- as.numeric(q3 + 1.5 * iqr_val)
+
+print(paste("Lower Bound (IQR Method):", lower_bound))
+print(paste("Upper Bound (IQR Method):", upper_bound))
+
+BAT_outliers <- BAT %>% 
+  mutate(is_outliers = ifelse(daily_returns < lower_bound | daily_returns > upper_bound, 1, 0))
+
+```
+
+
+### Exercise 2.7 Clustering
+
+* Use `ml_kmeans()` to cluster simple daily returns of "BRITISH AMER TOBACCO PLC".
+
+```{r clustering}
+
+# 1. select subset from "BRITISH AMER TOBACCO PLC"
+BAT <- compustat1 %>%
+  filter(conm=="BRITISH AMER TOBACCO PLC") %>% 
+  filter(!is.na(daily_returns)) 
+
+# 2. Assemble features (K-Means needs a vector column) using ft_vector_assembler
+returns_featured_tbl <- BAT %>%
+    ft_vector_assembler(input_cols = "daily_returns", output_col = "features")
+
+# 3. K-Means (example with k=5)
+kmeans_model <- ml_kmeans(returns_featured_tbl, k = 5, features_col = "features", prediction_col = "cluster_id")
+
+results <- ml_transform(kmeans_model, returns_featured_tbl)
+
+
+```
+
+### Exercise 2.8 Clustering with multiple columns
+
+* Use `ml_kmeans()` to cluster `prccd`, `prchd`, `prcld` of "BRITISH AMER TOBACCO PLC".
+
+```{r clustering1}
+
+# 1. select subset from "BRITISH AMER TOBACCO PLC"
+BAT <- compustat1 %>%
+  filter(conm=="BRITISH AMER TOBACCO PLC") %>% 
+  filter(!is.na(prccd), !is.na(prchd), !is.na(prccd))  
+  # filter(!is.na(daily_returns)) 
+
+# 2. Vectorize the features
+compustat_scaled <- BAT %>%
+  ft_vector_assembler(input_cols = c("prccd"), output_col = "prccd_vec") %>%
+  ft_vector_assembler(input_cols = c("prchd"), output_col = "prchd_vec") %>%
+  ft_vector_assembler(input_cols = c("prcld"), output_col = "prcld_vec") %>%
+  ft_standard_scaler(input_col = "prccd_vec", output_col = "prccd_scaled") %>%
+  ft_standard_scaler(input_col = "prchd_vec", output_col = "prchd_scaled") %>%
+  ft_standard_scaler(input_col = "prcld_vec", output_col = "prcld_scaled")
+
+# 3. Assemble features (K-Means needs a vector column) of prccd, prchd and prcld
+returns_featured_tbl <- compustat_scaled %>%
+    ft_vector_assembler(input_cols = c("prccd_scaled","prchd_scaled", "prcld_scaled"), output_col = "features")
+
+# 4. K-Means (example with k=5)
+kmeans_model <- ml_kmeans(returns_featured_tbl, k = 5, features_col = "features", prediction_col = "cluster_id")
+
+results <- ml_transform(kmeans_model, returns_featured_tbl)
+
+
+```
+
+### Exercise 2.9 Correlation of close price
+
+* Use `ml_corr` to work out correlation of `prccd` from "BRITISH AMER TOBACCO PLC" and "GOODWIN PLC".
+
+```{r correlation}
+# 1. Select "BRITISH AMER TOBACCO PLC" and "GOODWIN PLC", both iids are "01W".
+GOODWIN_BAT_01W <- compustat %>% 
+  filter(conm == "BRITISH AMER TOBACCO PLC" | conm == "GOODWIN PLC")
+
+# 2. Widen the data using `sdf_pivot()` to achieve rows as company name and their prccd price
+test_wider <-GOODWIN_BAT_01W %>% 
+  sdf_pivot(
+     datadate ~ conm,
+     fun.aggregate = list(prccd = "first")
+  )
+
+# 3. (optional) Rename the rows
+wide_tbl_renamed <- test_wider %>%
+  rename_with(
+    .cols = c("BRITISH AMER TOBACCO PLC", "GOODWIN PLC"),    # Apply renaming to the company columns
+    #.fn = ~ paste0(.x, "_prccd")          # Function to append "_prccd"
+    .fn = ~ paste0(c("BAT","GOODWIN"), "_prccd")
+    #.fn = ~ paste0(gsub("[^A-Za-z0-9_]", "_", .x), "_prccd") # Cleans names if necessary
+  )
+
+# 4. Calculate correlation
+wide_tbl_renamed_corr <- wide_tbl_renamed %>% 
+  ml_corr(columns = c("BAT_prccd", "GOODWIN_prccd"), method = "pearson")
+```
+
+## Part 2 ends.
+
