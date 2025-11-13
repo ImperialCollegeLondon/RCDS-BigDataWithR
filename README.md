@@ -11,9 +11,17 @@ in-person or online
 
 - dplyr or tidyverse in R: self-learning tutorial [https://github.com/ImperialCollegeLondon/RCDS-data-processing-with-r](https://github.com/ImperialCollegeLondon/RCDS-data-processing-with-r)
 
+### Setup RStudio environment
 
-**NOTE: If you have access to [HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/get-access/), you can setup your RStudio environment on HPC with [Open OnDemand](https://openondemand.rcs.ic.ac.uk/)** 
+#### Option 1: GitHub Codespace
 
+- Create GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main"
+
+#### Option 2: HPC
+
+If you have access to [HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/get-access/), you can setup your RStudio environment on HPC with [Open OnDemand](https://openondemand.rcs.ic.ac.uk/)
+
+#### Option 3: Local computer
 - Setup R and RStudio environment
   - install R 4.1 or higher (**skip this step on HPC**)
   - install the latest RStudio (**skip this step on HPC** )
