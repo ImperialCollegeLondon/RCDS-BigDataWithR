@@ -19,6 +19,8 @@ in-person or online
 
 - Access RStudio Server in the Codespace from 'PORTS' tab (usually at port 8787)
 
+    - In the 'TERMINAL' tab, run `watch -n 1200 ls` to avoid Codespace from going to sleep
+
 #### Option 2: HPC
 
 If you have access to [HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/get-access/), you can setup your RStudio environment on HPC with [Open OnDemand](https://openondemand.rcs.ic.ac.uk/)
