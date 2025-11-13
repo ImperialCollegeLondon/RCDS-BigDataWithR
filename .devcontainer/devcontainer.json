@@ -43,7 +43,7 @@
   },
 
 // Install RStudio Server, create user, set configs
-  "postCreateCommand": "/bin/bash -c 'apt-get update && apt-get install -y --no-install-recommends wget gdebi-core ca-certificates && wget -O /tmp/rstudio-server.deb https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2025.05.1-513-amd64.deb && gdebi -n /tmp/rstudio-server.deb && rm -f /tmp/rstudio-server.deb && id -u rstudio >/dev/null 2>&1 || useradd -m -s /bin/bash -u 1000 rstudio && echo rstudio:rstudio | chpasswd || true && printf \"auth-none=1\\nwww-address=0.0.0.0\\n\" > /etc/rstudio/rserver.conf && printf \"session-default-working-dir=/workspaces/RCDS-BigDataWithR\\nsession-default-new-project-dir=/workspaces/RCDS-BigDataWithR\\n\" > /etc/rstudio/rsession.conf && chown -R rstudio:rstudio /workspaces/RCDS-BigDataWithR || true && rstudio-server start'",
+  "postCreateCommand": "/bin/bash -c 'apt-get update && apt-get install -y --no-install-recommends wget gdebi-core ca-certificates && wget -O /tmp/rstudio-server.deb https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2025.05.1-513-amd64.deb && gdebi -n /tmp/rstudio-server.deb && rm -f /tmp/rstudio-server.deb && id -u rstudio >/dev/null 2>&1 || useradd -m -s /bin/bash -u 1000 rstudio && echo rstudio:rstudio | chpasswd || true && printf \"auth-none=1\\nwww-address=0.0.0.0\\n\" > /etc/rstudio/rserver.conf && printf \"session-default-working-dir=/workspaces/RCDS-BigDataWithR\\nsession-default-new-project-dir=/workspaces/RCDS-BigDataWithR\\n\" > /etc/rstudio/rsession.conf && chown -R rstudio:rstudio /workspaces/RCDS-BigDataWithR || true && rstudio-server start && su - rstudio -c \"Rscript -e \'sparklyr::spark_install()\'\" '",
 
 
   "postStartCommand": "rstudio-server restart || rstudio-server start",
