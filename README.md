@@ -17,6 +17,8 @@ in-person or online
 
 - Create GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main"
 
+- Access RStudio Server in the Codespace from 'PORTS' tab (usually at port 8787)
+
 #### Option 2: HPC
 
 If you have access to [HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/get-access/), you can setup your RStudio environment on HPC with [Open OnDemand](https://openondemand.rcs.ic.ac.uk/)
