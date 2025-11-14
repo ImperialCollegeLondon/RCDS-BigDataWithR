@@ -17,9 +17,24 @@ in-person or online
 
 - Create GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main"
 
+- run 
+`
+wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
+`
+to download spark package (about 400MB)
+
+- upload the downloaded `spark-3.5.3-bin-hadoop3.tgz` to the Codespace (drag and drop is OK)
+
+
 - Access RStudio Server in the Codespace from 'PORTS' tab (usually at port 8787)
 
     - In the 'TERMINAL' tab, run `watch -n 1200 ls` to avoid Codespace from going to sleep
+
+- In the RStudio Server (Open from the 'PORTS' tab), install "sparklyr" using console window for Part 2 (day 2) exercises:
+
+  - library(sparklyr)
+
+  - spark_install_tar('/path/to/spark-3.5.3-bin-hadoop3.tgz')
 
 #### Option 2: HPC
 
