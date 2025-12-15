@@ -26,24 +26,17 @@ in-person or online
     
     **if username and password are required to login RStudio, please use rstudio as both username and password.**
     
-- run 
-`
-wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
-`
-to download spark package (about 400MB)
-
-- upload the downloaded `spark-3.5.3-bin-hadoop3.tgz` to the Codespace (drag and drop is OK)
 
 
 - Access RStudio Server in the Codespace from 'PORTS' tab (usually at port 8787)
 
     - In the 'TERMINAL' tab, run `watch -n 1200 ls` to avoid Codespace from going to sleep
 
-- In the RStudio Server (Open from the 'PORTS' tab), install "sparklyr" using console window for Part 2 (day 2) exercises:
+- In the RStudio Server (Open from the 'PORTS' tab)
 
-  - library(sparklyr)
-
-  - spark_install_tar('/path/to/spark-3.5.3-bin-hadoop3.tgz')
+    - go to "code" sub-directory from lower-right pane (Files tab)
+    - open bigdata_R_part1.Rmd for day 1
+    - open bigdata_R_part2.Rmd for day 2
 
 #### Option 2: HPC
 
