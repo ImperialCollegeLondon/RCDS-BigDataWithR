@@ -30,7 +30,11 @@ library(dplyr)
 library(ggplot2)
 ```
 
+**Run the spark_install_tar only once**
+
 ```{r install sparklyr}
+# run only once
+
 spark_install_tar('spark-3.5.3-bin-hadoop3.tgz')
 ```
 
