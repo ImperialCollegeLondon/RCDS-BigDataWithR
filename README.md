@@ -98,3 +98,6 @@ Please check [bigdata_R_part2.Rmd](code/bigdata_R_part2.Rmd) for hands-on practi
 I am particularly thankful to Dr. Katerina Michalickova, Dr. Chris Cooling, Dr. John W. Pinney, and Dr. Jay DesLauriers for their invaluable insights and advice.
 
 ## Feedback form
+
+Please use this link [https://ecri.short.gy/feedback-rcds
+](https://ecri.short.gy/feedback-rcds) to give feedback about this workshop. Thank you very much for your input.
