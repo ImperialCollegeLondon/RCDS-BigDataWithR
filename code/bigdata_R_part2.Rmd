@@ -10,6 +10,17 @@ output: html_notebook
 ## Set up running environment
 
 To set up a running environment for allowing Spark connection to a file, `sparklyr` library needs to be loaded and configured.
+### Download sparklyr package
+
+```{r check working dir}
+getwd()
+```
+
+
+```{bash, message=F}
+wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
+```
+
 
 Run the following configuration to complete setup.
 
@@ -17,6 +28,10 @@ Run the following configuration to complete setup.
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
+```
+
+```{r install sparklyr}
+spark_install_tar('spark-3.5.3-bin-hadoop3.tgz')
 ```
 
 
@@ -52,8 +67,17 @@ Optional: the yarn.executor.memoryOverhead configuration in Spark specifies the 
 
 ## Set connection to the CSV data
 
+
+```{bash, message=F}
+# if the data doesn't exist in the current working directory
+# "/workspaces/RCDS-BigDataWithR/code" (default if you haven't changed it)
+# please run the following line command
+unzip ../data/compustat2023.csv.zip
+```
+
+
 ```{r connect to csv}
-compustat <- spark_read_csv(sc, "~/Downloads/computstat_gbr_2014_2024.csv")
+compustat <- spark_read_csv(sc, "computstat_gbr_2014_2024.csv")
 ```
 
 
