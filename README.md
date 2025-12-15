@@ -36,7 +36,11 @@ in-person or online
 
     - go to "code" sub-directory from lower-right pane (Files tab)
     - open bigdata_R_part1.Rmd for day 1
-    - open bigdata_R_part2.Rmd for day 2
+    - open bigdata_R_part2.Rmd for day 2 
+    
+    **NOTE:** if you have found the bigdata_R_part2.Rmd (or bigdata_R_part1.Rmd) in your RStudio is different from the remote GitHub repository, that is because there are updates after you have created your codespace, please use codespace to pull the updates.
+    
+    <img src="/fig/fetch_updates.png" width="500" />
 
 #### Option 2: HPC
 
