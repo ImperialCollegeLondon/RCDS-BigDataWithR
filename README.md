@@ -15,8 +15,9 @@ in-person or online
 
 #### Option 1: GitHub Codespace
 
-- Create GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main"
-
+- Create or return to GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main" or "return to existing codespace""
+    <img src="/fig/create_or_return_codespaces.png" width="500" />
+    
 - run 
 `
 wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
