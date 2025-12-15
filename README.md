@@ -13,10 +13,16 @@ in-person or online
 
 ### Setup RStudio environment
 
-#### Option 1: GitHub Codespace
+#### Option 1: GitHub Codespace (recommended)
 
 - Create or return to GitHub Codespace for this repository by clicking the green "Code" button and then "Create codespace on main" or "return to existing codespace""
     <img src="/fig/create_or_return_codespaces.png" width="500" />
+    
+    - wait for about 5-10 minutes for creating a codespace. 
+    
+    - From the PORT (lower pane on the middle or right-hand side), "8787" port should be green and click on the "globe" icon
+    
+    <img src="/fig/rstudio_port.png" width="500" />
     
 - run 
 `
