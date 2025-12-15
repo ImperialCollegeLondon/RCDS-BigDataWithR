@@ -24,6 +24,8 @@ in-person or online
     
     <img src="/fig/rstudio_port.png" width="500" />
     
+    **if username and password are required to login RStudio, please use rstudio as both username and password.**
+    
 - run 
 `
 wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
