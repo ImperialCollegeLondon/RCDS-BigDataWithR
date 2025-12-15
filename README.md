@@ -38,7 +38,7 @@ in-person or online
     - open bigdata_R_part1.Rmd for day 1
     - open bigdata_R_part2.Rmd for day 2 
     
-    **NOTE:** if you have found the bigdata_R_part2.Rmd (or bigdata_R_part1.Rmd) in your RStudio is different from the remote GitHub repository, that is because there are updates after you have created your codespace, please use codespace to pull the updates.
+    **NOTE:** if you have found the bigdata_R_part2.Rmd (or bigdata_R_part1.Rmd) in your RStudio is different from the remote GitHub repository, that is because there are updates after you have created your codespace, please use codespace to pull the updates (instructions shown in the figure below).
     
     <img src="/fig/fetch_updates.png" width="500" />
 
