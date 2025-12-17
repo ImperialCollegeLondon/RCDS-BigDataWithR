@@ -30,7 +30,13 @@ in-person or online
 
 - Access RStudio Server in the Codespace from 'PORTS' tab (usually at port 8787)
 
-    - In the 'TERMINAL' tab, run `watch -n 600 ls` to avoid Codespace from going to sleep
+    - In the 'TERMINAL' tab of Codespace, run `watch -n 600 ls` to avoid Codespace from going to sleep
+    
+    - Type in `watch -n 600 ls` and press enter.
+    <img src="/fig/codespace_terminal_cmd1.png" width="500" />
+    
+    - When the command is running, the terminal window should look like
+    <img src="/fig/codespace_terminal_cmd2.png" width="500" />
 
 - In the RStudio Server (Open from the 'PORTS' tab)
 

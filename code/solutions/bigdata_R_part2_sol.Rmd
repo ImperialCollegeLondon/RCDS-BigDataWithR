@@ -19,6 +19,23 @@ library(dplyr)
 library(ggplot2)
 ```
 
+```{r check working dir}
+getwd()
+```
+
+**Run the wget only once**
+```{bash, message=F}
+wget -O spark-3.5.3-bin-hadoop3.tgz https://archive.apache.org/dist/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
+```
+
+**Run the spark_install_tar only once**
+
+```{r install sparklyr}
+# run only once
+
+spark_install_tar('spark-3.5.3-bin-hadoop3.tgz')
+```
+
 
 ```{r set up spark env}
 
@@ -26,9 +43,9 @@ library(ggplot2)
 config <- spark_config()
 
 # Setup memory
-config$`sparklyr.shell.driver-memory` <- "4G"
-config$`sparklyr.shell.executor-memory` <- "8G"
-config$`spark.yarn.executor.memoryOverhead` <- "4G"
+config$`sparklyr.shell.driver-memory` <- "2G"
+config$`sparklyr.shell.executor-memory` <- "3G"
+config$`spark.yarn.executor.memoryOverhead` <- "512M"
 
 # Connnect to local cluster with the configuration given above
 sc <- spark_connect(master = "local", config = config)
@@ -52,8 +69,15 @@ Optional: the yarn.executor.memoryOverhead configuration in Spark specifies the 
 
 ## Set connection to the CSV data
 
+```{bash, message=F}
+# if the data doesn't exist in the current working directory
+# "/workspaces/RCDS-BigDataWithR/code" (default if you haven't changed it)
+# please run the following line command
+unzip ../data/compustat2023.csv.zip
+```
+
 ```{r connect to csv}
-compustat <- spark_read_csv(sc, "~/Downloads/computstat_gbr_2014_2024.csv")
+compustat <- spark_read_csv(sc, "computstat_gbr_2014_2024.csv")
 ```
 
 
