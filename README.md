@@ -1,6 +1,10 @@
 # Big Data with R
 This is an introduction to Big Data with R course at Imperial College London. Over the span of two 1.5-hour sessions, participants will gain hands-on experience with powerful tools such as **data.table** and **Sparklyr** in R. There sessions are designed to equip you with practical skills for managing and analyzing large datasets in your daily research activities, enhancing your research capabilities with dynamic and efficient methods. Join us to explore there essential big data techniques and elevate your data analysis proficiency.
 
+A glimpse of efficiency among `data.frame`, `data.table` and `spark` in R.
+<img src="/fig/performance_comp.png" width="500" />
+
+
 ## Course length and deliver method
 2 x 1.5 hour classes
 in-person or online
