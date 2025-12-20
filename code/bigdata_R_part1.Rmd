@@ -18,22 +18,39 @@ library(dtplyr)
 
 ## Load data
 
+### Unzip the data (run only once)
+```{bash, message=F}
+# if the data doesn't exist in the current working directory
+# "/workspaces/RCDS-BigDataWithR/code" (default if you haven't changed it)
+# please run the following line command
+unzip ../data/compustat2023.csv.zip
+```
+
 `fread()` is a function provided by `data.table` package. It offers a faster and more convenient way to load large data. Similar to the legacy function `read.csv()`, all controls such as sep, colClasses and nrows are automatically detected.
 
 * Run `fread()` function to load testing data. 
     
 * Compare the performance of `read.csv()` and `fread()`. (Hint: to observe the performance, `Sys.time()`)
+
+
     
-```{r load data}
+```{r load data with data frame}
 # use read.csv() and Sys.time() to check the loading time
 # for example
-# starting <- Sys.time()
-# compustat <- read.csv("path/to/data")
-# Sys.time() - starting
+starting <- Sys.time()
+compustat <- read.csv("computstat_gbr_2014_2024.csv")
+Sys.time() - starting
+```
 
+```{r load data with data table}
 
 # use fread() and Sys.time() to observe the loading time
+starting <- Sys.time()
+compustat <- fread("computstat_gbr_2014_2024.csv")
+Sys.time() - starting
 ```
+
+* which method is the winner?
 
 ## Data manipulation
 
